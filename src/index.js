@@ -4,7 +4,7 @@ var rread = require('readdir-recursive'),
     sync = require('./sync');
 
 module.exports = function (options) {
-    var basename = path.basename(module.filename);
+    var basename = path.basename(module.filename + '/model');
 
     var sequelize = new Sequelize(options.name, options.user, options.pass,{
         host: options.host,
@@ -21,10 +21,10 @@ module.exports = function (options) {
     var db = {};
 
     rread
-        .fileSync(__dirname)
+        .fileSync(__dirname + '/model')
         .filter(function(file) {
             file = path.basename(file);
-            return (file.slice(-3) === '.js') && (file.indexOf('.') !== 0) && (file !== basename);
+            return (file.slice(-3) === '.js') && (file !== basename);
         })
         .forEach(function(file) {
             var model = sequelize['import'](file);
@@ -37,7 +37,7 @@ module.exports = function (options) {
         }
     });
 
-    db.sync = sync;
+    db.sync = sync.bind(this,options);
 
     db.sequelize = sequelize;
     db.Sequelize = Sequelize;
