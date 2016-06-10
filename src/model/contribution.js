@@ -88,13 +88,13 @@ module.exports = function(sequelize, DataTypes) {
             using: sequelize.getDialect() == 'postgres' ? 'gin' : null
         }, {
             name: 'fec_expenditures_contributor_first_name',
-            fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('lower', 'contributor_first_name' )] : 'contributor_first_name'
+            fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('lower', sequelize.col('contributor_first_name') )] : 'contributor_first_name'
         }, {
             name: 'fec_expenditures_contributor_last_name',
-            fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('lower', 'contributor_last_name' )] : 'contributor_last_name'
+            fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('lower', sequelize.col('contributor_last_name') )] : 'contributor_last_name'
         }, {
             name: 'fec_expenditures_contributor_state',
-            fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('lower', 'contributor_state' )] : 'contributor_state'
+            fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('lower', sequelize.col('contributor_state') )] : 'contributor_state'
         }]
     });
 
