@@ -76,7 +76,8 @@ module.exports = function(sequelize, DataTypes) {
         classMethods: {
             associate: function(models) {
                 GroupSummary.belongsTo(models.fec_filing, {
-                    foreignKey: 'filing_id'
+                    foreignKey: 'filing_id',
+                    onDelete: 'CASCADE'
                 });
 
                 GroupSummary.belongsTo(models.fec_amended_filing, {

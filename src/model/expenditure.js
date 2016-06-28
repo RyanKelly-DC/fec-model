@@ -63,7 +63,8 @@ module.exports = function(sequelize, DataTypes) {
             associate: function(models) {
                 Expenditure.belongsTo(models.fec_filing,{
                     as: 'Filing',
-                    foreignKey: 'filing_id'
+                    foreignKey: 'filing_id',
+                    onDelete: 'CASCADE'
                 });
             },
             match: function (row) {

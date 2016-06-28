@@ -62,7 +62,8 @@ module.exports = function(sequelize, DataTypes) {
         classMethods: {
             associate: function(models) {
                 Contribution.belongsTo(models.fec_filing,{
-                    foreignKey: 'filing_id'
+                    foreignKey: 'filing_id',
+                    onDelete: 'CASCADE'
                 });
             },
             match: function (row) {
