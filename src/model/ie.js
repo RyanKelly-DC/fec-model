@@ -76,6 +76,11 @@ module.exports = function(sequelize, DataTypes) {
         memo_text_description: DataTypes.STRING(255)
     }, {
         classMethods: {
+            associate: function(models) {
+                IndependentExpenditure.belongsTo(models.fec_filing, {
+                    foreignKey: 'filing_id'
+                });
+            },
             match: function (row) {
                 if (row.form_type && row.form_type.match(/^(SE|F57)/)) {
                     return true;

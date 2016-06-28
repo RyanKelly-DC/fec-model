@@ -63,7 +63,6 @@ module.exports = function(sequelize, DataTypes) {
             associate: function(models) {
                 Expenditure.belongsTo(models.fec_filing,{
                     as: 'Filing',
-                    constraints: false,
                     foreignKey: 'filing_id'
                 });
             },

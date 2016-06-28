@@ -62,7 +62,6 @@ module.exports = function(sequelize, DataTypes) {
         classMethods: {
             associate: function(models) {
                 Contribution.belongsTo(models.fec_filing,{
-                    constraints: false,
                     foreignKey: 'filing_id'
                 });
             },

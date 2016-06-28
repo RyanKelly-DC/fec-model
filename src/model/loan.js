@@ -54,7 +54,6 @@ module.exports = function(sequelize, DataTypes) {
         classMethods: {
             associate: function(models) {
                 Loan.belongsTo(models.fec_filing, {
-                    constraints: false,
                     foreignKey: 'filing_id'
                 });
             },
