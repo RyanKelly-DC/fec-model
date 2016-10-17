@@ -14,7 +14,13 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.DATEONLY,
             set: function(val) {
                 if (val && !(val instanceof Date) && val.toString().match(/^[0-9]{8}$/)) {
-                    this.setDataValue('received_date', moment(val, 'YYYYMMDD').toDate());
+                    var m = moment(val, 'YYYYMMDD');
+                    if (m.isValid()) {
+                        this.setDataValue('received_date', m.toDate());
+                    }
+                    else {
+                        this.setDataValue('received_date', null);
+                    }
                 } else {
                     this.setDataValue('received_date', val);
                 }
