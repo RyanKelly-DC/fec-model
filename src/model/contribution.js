@@ -83,17 +83,17 @@ module.exports = function(sequelize, DataTypes) {
         }, {
             fields: ['form_type']
         }, {
-            name: 'fec_expenditures_contributor_organization_name',
+            name: 'fec_contributions_contributor_organization_name',
             fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('to_tsvector', 'english', sequelize.col('contributor_organization_name') )] : 'contributor_organization_name',
             using: sequelize.getDialect() == 'postgres' ? 'gin' : null
         }, {
-            name: 'fec_expenditures_contributor_first_name',
+            name: 'fec_contributions_contributor_first_name',
             fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('lower', sequelize.col('contributor_first_name') )] : 'contributor_first_name'
         }, {
-            name: 'fec_expenditures_contributor_last_name',
+            name: 'fec_contributions_contributor_last_name',
             fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('lower', sequelize.col('contributor_last_name') )] : 'contributor_last_name'
         }, {
-            name: 'fec_expenditures_contributor_state',
+            name: 'fec_contributions_contributor_state',
             fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('lower', sequelize.col('contributor_state') )] : 'contributor_state'
         }]
     });
