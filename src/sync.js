@@ -23,6 +23,28 @@ function syncModels(options,cb) {
         });
 }
 
+
+function createExtension(options,cb) {
+    var pg = require('pg');
+
+    var conString = 'postgres://' + options.user + ':' + options.pass +
+                    '@' + options.host + ':' + options.port +'/' + options.name;
+
+    console.info('connecting to database server');
+    pg.connect(conString, function(err, client, done) {
+        if (err) {
+            throw err;
+        }
+
+        console.info('creating extension if it doesn\'t exist');
+        client.query('CREATE EXTENSION pg_trgm;', function(err) {
+            client.end();
+
+            cb();
+        });
+    });
+}
+
 function createDatabase(options,cb) {
     if (options.driver == 'postgres') {
         // try to create database first if dialect is postgres
@@ -42,7 +64,7 @@ function createDatabase(options,cb) {
             client.query('CREATE DATABASE ' + options.name, function(err) {
                 client.end();
 
-                cb();
+                createExtension(options,cb);
             });
         });
     }

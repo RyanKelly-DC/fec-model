@@ -87,11 +87,15 @@ module.exports = function(sequelize, DataTypes) {
             fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('to_tsvector', 'english', sequelize.col('payee_organization_name') )] : 'payee_organization_name',
             using: sequelize.getDialect() == 'postgres' ? 'gin' : null
         }, {
-            name: 'fec_expenditures_payee_payee_first_name',
-            fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('lower', sequelize.col('payee_first_name') )] : 'payee_first_name'
+            name: 'fec_expenditures_payee_first_name_trgm',
+            fields: ['payee_first_name'],
+            method: 'gin',
+            operator: 'gin_trgm_ops'
         }, {
-            name: 'fec_expenditures_payee_payee_last_name',
-            fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('lower', sequelize.col('payee_last_name') )] : 'payee_last_name'
+            name: 'fec_expenditures_payee_last_name_trgm',
+            fields: ['payee_last_name'],
+            method: 'gin',
+            operator: 'gin_trgm_ops'
         }, {
             name: 'fec_expenditures_payee_payee_state',
             fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('lower', sequelize.col('payee_state') )] : 'payee_state'
