@@ -23,6 +23,7 @@ module.exports = function(sequelize, DataTypes) {
         },
         report_number: DataTypes.INTEGER
     }, {
+        timestamps: true,
         classMethods: {
             match: function (row) {
                 if (row.record_type && row.record_type == 'HDR') {

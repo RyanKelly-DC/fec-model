@@ -13,7 +13,8 @@ module.exports = function (options) {
         define: {
             createdAt: 'created_date',
             updatedAt: 'updated_date',
-            underscored: true
+            underscored: true,
+            timestamps: false
         },
         logging: false
     });
