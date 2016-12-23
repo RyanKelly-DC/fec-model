@@ -21,7 +21,8 @@ module.exports = function(sequelize, DataTypes) {
                 }
             }
         },
-        report_number: DataTypes.INTEGER
+        report_number: DataTypes.INTEGER,
+        comment: DataTypes.STRING(255)
     }, {
         timestamps: true,
         classMethods: {
