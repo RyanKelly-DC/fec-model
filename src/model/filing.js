@@ -14,7 +14,7 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.INTEGER,
             set: function(val) {
                 if (val) {
-                    this.setDataValue('report_id', parseInt(val.replace('FEC-','')));
+                    this.setDataValue('report_id', parseInt(val.replace('FEC-','').replace('SEN-','')));
                 }
                 else {
                     this.setDataValue('report_id', val);
