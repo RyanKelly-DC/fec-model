@@ -19,51 +19,51 @@ module.exports = function(sequelize, DataTypes) {
         election_district: DataTypes.STRING(255),
         report_code: DataTypes.STRING(255),
         election_date: {
-                    type: DataTypes.DATEONLY,
-                    set: function(val) {
-                        if (val && !(val instanceof Date) && val.toString().match(/^[0-9]{8}$/)) {
-                            this.setDataValue('election_date', moment(val, 'YYYYMMDD').toDate());
-                        } else {
-                            this.setDataValue('election_date', val);
-                        }
-                    }
-                },
+            type: DataTypes.DATEONLY,
+            set: function(val) {
+                if (val && !(val instanceof Date) && val.toString().match(/^[0-9]{8}$/)) {
+                    this.setDataValue('election_date', moment(val, 'YYYYMMDD').toDate());
+                } else {
+                    this.setDataValue('election_date', val);
+                }
+            }
+        },
         state_of_election: DataTypes.STRING(255),
         coverage_from_date: {
-                    type: DataTypes.DATEONLY,
-                    set: function(val) {
-                        if (val && !(val instanceof Date) && val.toString().match(/^[0-9]{8}$/)) {
-                            this.setDataValue('coverage_from_date', moment(val, 'YYYYMMDD').toDate());
-                        } else {
-                            this.setDataValue('coverage_from_date', val);
-                        }
-                    }
-                },
+            type: DataTypes.DATEONLY,
+            set: function(val) {
+                if (val && !(val instanceof Date) && val.toString().match(/^[0-9]{8}$/)) {
+                    this.setDataValue('coverage_from_date', moment(val, 'YYYYMMDD').toDate());
+                } else {
+                    this.setDataValue('coverage_from_date', val);
+                }
+            }
+        },
         coverage_through_date: {
-                    type: DataTypes.DATEONLY,
-                    set: function(val) {
-                        if (val && !(val instanceof Date) && val.toString().match(/^[0-9]{8}$/)) {
-                            this.setDataValue('coverage_through_date', moment(val, 'YYYYMMDD').toDate());
-                        } else {
-                            this.setDataValue('coverage_through_date', val);
-                        }
-                    }
-                },
+            type: DataTypes.DATEONLY,
+            set: function(val) {
+                if (val && !(val instanceof Date) && val.toString().match(/^[0-9]{8}$/)) {
+                    this.setDataValue('coverage_through_date', moment(val, 'YYYYMMDD').toDate());
+                } else {
+                    this.setDataValue('coverage_through_date', val);
+                }
+            }
+        },
         treasurer_last_name: DataTypes.STRING(255),
         treasurer_first_name: DataTypes.STRING(255),
         treasurer_middle_name: DataTypes.STRING(255),
         treasurer_prefix: DataTypes.STRING(255),
         treasurer_suffix: DataTypes.STRING(255),
         date_signed: {
-                    type: DataTypes.DATEONLY,
-                    set: function(val) {
-                        if (val && !(val instanceof Date) && val.toString().match(/^[0-9]{8}$/)) {
-                            this.setDataValue('date_signed', moment(val, 'YYYYMMDD').toDate());
-                        } else {
-                            this.setDataValue('date_signed', val);
-                        }
-                    }
-                },
+            type: DataTypes.DATEONLY,
+            set: function(val) {
+                if (val && !(val instanceof Date) && val.toString().match(/^[0-9]{8}$/)) {
+                    this.setDataValue('date_signed', moment(val, 'YYYYMMDD').toDate());
+                } else {
+                    this.setDataValue('date_signed', val);
+                }
+            }
+        },
         col_a_total_contributions_no_loans: DataTypes.DECIMAL(12, 2),
         col_a_total_contributions_refunds: DataTypes.DECIMAL(12, 2),
         col_a_net_contributions: DataTypes.DECIMAL(12, 2),
@@ -154,13 +154,15 @@ module.exports = function(sequelize, DataTypes) {
                     onDelete: 'CASCADE'
                 });
 
-//                PaperCampaignSummary.belongsTo(models.fec_amended_filing, {
-//                    constraints: false,
-//                    foreignKey: 'filing_id'
-//                });
+                // PaperCampaignSummary.belongsTo(models.fec_amended_filing, {
+                //     constraints: false,
+                //     foreignKey: 'filing_id'
+                // });
             },
-            match: function (row) {
-                if (row.form_type && row.form_type.match(/^(F3)/) && !row.form_type.match(/^(F3Z|F3S|F3L)/) && row.report_code) {
+            match: function(row) {
+                if (row.form_type && row.form_type.match(/^(F3)/) &&
+                    !row.form_type.match(/^(F3Z|F3S|F3L)/) &&
+                    row.report_code) {
                     return true;
                 }
                 return false;
