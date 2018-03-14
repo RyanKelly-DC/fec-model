@@ -150,7 +150,7 @@ module.exports = function(sequelize, DataTypes) {
             },
             match: function (row) {
                 if (row.form_type && row.form_type.match(/^(F3)/) && 
-                    !row.form_type.match(/^(F3Z)/)) {
+                    !row.form_type.match(/^(F3Z|F3S)/)) {
                     return true;
                 }
                 return false;
