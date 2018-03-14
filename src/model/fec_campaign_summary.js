@@ -1,7 +1,7 @@
 var moment = require('moment');
 
 module.exports = function(sequelize, DataTypes) {
-    var PACSummary = sequelize.define('fec_campaign_summary', {
+    var CampaignSummary = sequelize.define('fec_campaign_summary', {
         filing_id: {
             type: DataTypes.INTEGER,
             unique: true
@@ -138,12 +138,12 @@ module.exports = function(sequelize, DataTypes) {
     }, {
         classMethods: {
             associate: function(models) {
-                PACSummary.belongsTo(models.fec_filing,{
+                CampaignSummary.belongsTo(models.fec_filing,{
                     foreignKey: 'filing_id',
                     onDelete: 'CASCADE'
                 });
 
-                PACSummary.belongsTo(models.fec_amended_filing,{
+                CampaignSummary.belongsTo(models.fec_amended_filing,{
                     constraints: false,
                     foreignKey: 'filing_id'
                 });
@@ -160,5 +160,5 @@ module.exports = function(sequelize, DataTypes) {
         }]
     });
 
-    return PACSummary;
+    return CampaignSummary;
 };
