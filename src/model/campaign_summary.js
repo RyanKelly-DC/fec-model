@@ -149,7 +149,8 @@ module.exports = function(sequelize, DataTypes) {
                 });
             },
             match: function (row) {
-                if (row.form_type && row.form_type.match(/^(F3)/)) {
+                if (row.form_type && row.form_type.match(/^(F3)/) && 
+                    !row.form_type.match(/^(F3Z)/)) {
                     return true;
                 }
                 return false;
