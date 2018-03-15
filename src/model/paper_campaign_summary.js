@@ -162,7 +162,7 @@ module.exports = function(sequelize, DataTypes) {
             match: function(row) {
                 if (row.form_type && row.form_type.match(/^(F3)/) &&
                     !row.form_type.match(/^(F3Z|F3S|F3L)/) &&
-                    row.report_code) {
+                    row.begin_image_number) {
                     return true;
                 }
                 return false;
