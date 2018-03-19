@@ -261,7 +261,7 @@ module.exports = function(sequelize, DataTypes) {
             },
             match: function (row) {
                 if (row.form_type && row.form_type.match(/^(F3P)/) && 
-                    !row.form_type.match(/^(F3PS|F3P31)/)) {
+                    !row.form_type.match(/^(F3PZ|F3PS|F3P31)/)) {
                     return true;
                 }
                 return false;
