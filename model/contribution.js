@@ -1,7 +1,10 @@
-var moment = require('moment');
+const moment = require('moment'),
+      Sequelize = require('sequelize');
 
 module.exports = function(sequelize, DataTypes) {
-    var Contribution = sequelize.define('fec_contribution', {
+    class Contribution extends Sequelize.Model {}
+
+    Contribution.init({
         // cycle: DataTypes.STRING(5),
         filing_id: DataTypes.INTEGER,
         form_type: DataTypes.STRING(50),
@@ -59,21 +62,8 @@ module.exports = function(sequelize, DataTypes) {
         memo_text_description: DataTypes.STRING(255),
         reference_code: DataTypes.STRING(50)
     }, {
-        classMethods: {
-            associate: function(models) {
-                Contribution.belongsTo(models.fec_filing,{
-                    foreignKey: 'filing_id',
-                    onDelete: 'CASCADE'
-                });
-            },
-            match: function (row) {
-                if (row.form_type && row.form_type.match(/^SA/) && 
-                    !row.form_type.match(/^(SA3L)/)) {
-                    return true;
-                }
-                return false;
-            }
-        },
+        sequelize,
+        modelName: 'fec_contribution',
         indexes: [{
             fields: ['filing_id']
         },{
@@ -84,23 +74,39 @@ module.exports = function(sequelize, DataTypes) {
             fields: ['form_type']
         }, {
             name: 'fec_contributions_contributor_organization_name',
-            fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('to_tsvector', 'english', sequelize.col('contributor_organization_name') )] : 'contributor_organization_name',
-            using: sequelize.getDialect() == 'postgres' ? 'gin' : null
+            fields: sequelize.getDialect() == 'postgres' ?
+                [sequelize.fn('to_tsvector', 'english', sequelize.col('contributor_organization_name') )] :
+                'contributor_organization_name',
+            using: sequelize.getDialect() == 'postgres' ?
+                'gin' :
+                null
         }, {
             name: 'fec_contributions_contributor_first_name_trgm',
             fields: ['contributor_first_name'],
-            method: 'gin',
+            using: 'gin',
             operator: 'gin_trgm_ops'
         }, {
             name: 'fec_contributions_contributor_last_name_trgm',
             fields: ['contributor_last_name'],
-            method: 'gin',
+            using: 'gin',
             operator: 'gin_trgm_ops'
         }, {
             name: 'fec_contributions_contributor_state',
-            fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('lower', sequelize.col('contributor_state') )] : 'contributor_state'
+            fields: sequelize.getDialect() == 'postgres' ?
+                [sequelize.fn('lower', sequelize.col('contributor_state') )] :
+                'contributor_state'
         }]
     });
+
+    Contribution.associate = models => 
+        Contribution.belongsTo(models.fec_filing,{
+            foreignKey: 'filing_id',
+            onDelete: 'CASCADE'
+        });
+    
+    Contribution.match = row => 
+        row.form_type && row.form_type.match(/^SA/) && 
+            !row.form_type.match(/^(SA3L)/);
 
     return Contribution;
 };

@@ -1,7 +1,10 @@
-var moment = require('moment');
+const moment = require('moment'),
+      Sequelize = require('sequelize');
 
 module.exports = function(sequelize, DataTypes) {
-    var GroupSummary = sequelize.define('fec_group_summary', {
+    class GroupSummary extends Sequelize.Model {}
+
+    GroupSummary.init({
         filing_id: {
             type: DataTypes.INTEGER,
             unique: true
@@ -73,29 +76,27 @@ module.exports = function(sequelize, DataTypes) {
             }
         }
     }, {
-        classMethods: {
-            associate: function(models) {
-                GroupSummary.belongsTo(models.fec_filing, {
-                    foreignKey: 'filing_id',
-                    onDelete: 'CASCADE'
-                });
-
-                GroupSummary.belongsTo(models.fec_amended_filing, {
-                    constraints: false,
-                    foreignKey: 'filing_id'
-                });
-            },
-            match: function (row) {
-                if (row.form_type && row.form_type.match(/^(F5)/) && row.report_code) {
-                    return true;
-                }
-                return false;
-            }
-        },
+        sequelize,
+        modelName: 'fec_group_summary',
         indexes: [{
             fields: ['filer_committee_id_number']
         }]
     });
+
+    GroupSummary.associate = models => {
+        GroupSummary.belongsTo(models.fec_filing, {
+            foreignKey: 'filing_id',
+            onDelete: 'CASCADE'
+        });
+
+        GroupSummary.belongsTo(models.fec_amended_filing, {
+            constraints: false,
+            foreignKey: 'filing_id'
+        });
+    };
+    
+    GroupSummary.match = row =>
+        row.form_type && row.form_type.match(/^(F5)/) && row.report_code;
 
     return GroupSummary;
 };

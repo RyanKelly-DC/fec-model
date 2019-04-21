@@ -1,7 +1,10 @@
-var moment = require('moment');
+const moment = require('moment'),
+      Sequelize = require('sequelize');
 
 module.exports = function(sequelize, DataTypes) {
-    var LobbyistBundler = sequelize.define('fec_lobbyist_bundler', {
+    class LobbyistBundler extends Sequelize.Model {}
+
+    LobbyistBundler.init({
         filing_id: DataTypes.INTEGER,
         form_type: DataTypes.STRING(50),
         filer_committee_id_number: DataTypes.STRING(50),
@@ -58,26 +61,23 @@ module.exports = function(sequelize, DataTypes) {
         memo_text: DataTypes.STRING(255),
         reference_code: DataTypes.STRING(50)
     }, {
-        classMethods: {
-            associate: function(models) {
-                LobbyistBundler.belongsTo(models.fec_filing, {
-                    foreignKey: 'filing_id',
-                    onDelete: 'CASCADE'
-                });
-            },
-            match: function(row) {
-                if (row.form_type && row.form_type.match(/^SA3L/)) {
-                    return true;
-                }
-                return false;
-            }
-        },
+        sequelize,
+        modelName: 'fec_lobbyist_bundler',
         indexes: [{
             fields: ['filing_id']
         }, {
             fields: ['filer_committee_id_number']
         }]
     });
+
+    LobbyistBundler.associate = models =>
+        LobbyistBundler.belongsTo(models.fec_filing, {
+            foreignKey: 'filing_id',
+            onDelete: 'CASCADE'
+        });
+
+    LobbyistBundler.match = row => 
+        row.form_type && row.form_type.match(/^SA3L/);
 
     return LobbyistBundler;
 };

@@ -1,7 +1,10 @@
-var moment = require('moment');
+const moment = require('moment'),
+      Sequelize = require('sequelize');
 
 module.exports = function(sequelize, DataTypes) {
-    var PresidentialSummary = sequelize.define('fec_presidential_summary', {
+    class PresidentialSummary extends Sequelize.Model {}
+
+    PresidentialSummary.init({
         filing_id: {
             type: DataTypes.INTEGER,
             unique: true
@@ -247,30 +250,28 @@ module.exports = function(sequelize, DataTypes) {
         col_b_virgin_islands: DataTypes.DECIMAL(12,2),
         col_b_totals: DataTypes.DECIMAL(12,2)
     }, {
-        classMethods: {
-            associate: function(models) {
-                PresidentialSummary.belongsTo(models.fec_filing,{
-                    foreignKey: 'filing_id',
-                    onDelete: 'CASCADE'
-                });
-
-                PresidentialSummary.belongsTo(models.fec_amended_filing,{
-                    constraints: false,
-                    foreignKey: 'filing_id'
-                });
-            },
-            match: function (row) {
-                if (row.form_type && row.form_type.match(/^(F3P)/) && 
-                    !row.form_type.match(/^(F3PZ|F3PS|F3P31)/)) {
-                    return true;
-                }
-                return false;
-            }
-        },
+        sequelize,
+        modelName: 'fec_presidential_summary',
         indexes: [{
             fields: ['filer_committee_id_number']
         }]
     });
+
+    PresidentialSummary.associate = models => {
+        PresidentialSummary.belongsTo(models.fec_filing,{
+            foreignKey: 'filing_id',
+            onDelete: 'CASCADE'
+        });
+
+        PresidentialSummary.belongsTo(models.fec_amended_filing,{
+            constraints: false,
+            foreignKey: 'filing_id'
+        });
+    };
+
+    PresidentialSummary.match = row =>
+            row.form_type && row.form_type.match(/^(F3P)/) && 
+                    !row.form_type.match(/^(F3PZ|F3PS|F3P31)/);
 
     return PresidentialSummary;
 };

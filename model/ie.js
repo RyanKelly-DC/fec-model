@@ -1,7 +1,10 @@
-var moment = require('moment');
+const moment = require('moment'),
+      Sequelize = require('sequelize');
 
 module.exports = function(sequelize, DataTypes) {
-    var IndependentExpenditure = sequelize.define('fec_ie', {
+    class IndependentExpenditure extends Sequelize.Model {}
+
+    IndependentExpenditure.init({
         filing_id: DataTypes.INTEGER,
         form_type: DataTypes.STRING(20),
         filer_committee_id_number: DataTypes.STRING(30),
@@ -75,20 +78,8 @@ module.exports = function(sequelize, DataTypes) {
         memo_code: DataTypes.STRING(10),
         memo_text_description: DataTypes.STRING(255)
     }, {
-        classMethods: {
-            associate: function(models) {
-                IndependentExpenditure.belongsTo(models.fec_filing, {
-                    foreignKey: 'filing_id',
-                    onDelete: 'CASCADE'
-                });
-            },
-            match: function (row) {
-                if (row.form_type && row.form_type.match(/^(SE|F57)/)) {
-                    return true;
-                }
-                return false;
-            }
-        },
+        sequelize,
+        modelName: 'fec_ie',
         indexes: [{
             fields: ['filing_id']
         }, {
@@ -97,6 +88,15 @@ module.exports = function(sequelize, DataTypes) {
             fields: ['memo_code']
         }]
     });
+
+    IndependentExpenditure.associate = models =>
+        IndependentExpenditure.belongsTo(models.fec_filing, {
+            foreignKey: 'filing_id',
+            onDelete: 'CASCADE'
+        });
+
+    IndependentExpenditure.match = row => 
+        row.form_type && row.form_type.match(/^(SE|F57)/);
 
     return IndependentExpenditure;
 };

@@ -1,7 +1,10 @@
-var moment = require('moment');
+const moment = require('moment'),
+      Sequelize = require('sequelize');
 
 module.exports = function(sequelize, DataTypes) {
-    var CampaignSummary = sequelize.define('fec_campaign_summary', {
+    class CampaignSummary extends Sequelize.Model {}
+
+    CampaignSummary.init({
         filing_id: {
             type: DataTypes.INTEGER,
             unique: true
@@ -136,30 +139,32 @@ module.exports = function(sequelize, DataTypes) {
         col_b_other_disbursements: DataTypes.DECIMAL(12,2),
         col_b_total_disbursements: DataTypes.DECIMAL(12,2)
     }, {
-        classMethods: {
-            associate: function(models) {
-                CampaignSummary.belongsTo(models.fec_filing,{
-                    foreignKey: 'filing_id',
-                    onDelete: 'CASCADE'
-                });
-
-                CampaignSummary.belongsTo(models.fec_amended_filing,{
-                    constraints: false,
-                    foreignKey: 'filing_id'
-                });
-            },
-            match: function (row) {
-                if (row.form_type && row.form_type.match(/^(F3)/) && 
-                    !row.form_type.match(/^(F3Z|F3S|F3L)/)) {
-                    return true;
-                }
-                return false;
-            }
-        },
+        sequelize,
+        modelName: 'fec_campaign_summary',
         indexes: [{
             fields: ['filer_committee_id_number']
         }]
     });
+
+    CampaignSummary.associate = (models) => {
+        CampaignSummary.belongsTo(models.fec_filing,{
+            foreignKey: 'filing_id',
+            onDelete: 'CASCADE'
+        });
+
+        CampaignSummary.belongsTo(models.fec_amended_filing,{
+            constraints: false,
+            foreignKey: 'filing_id'
+        });
+    };
+    
+    CampaignSummary.match = (row) => {
+        if (row.form_type && row.form_type.match(/^(F3)/) && 
+            !row.form_type.match(/^(F3Z|F3S|F3L)/)) {
+            return true;
+        }
+        return false;
+    };
 
     return CampaignSummary;
 };

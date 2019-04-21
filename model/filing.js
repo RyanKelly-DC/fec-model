@@ -1,6 +1,9 @@
+const Sequelize = require('sequelize');
 
 module.exports = function(sequelize, DataTypes) {
-    var Filing = sequelize.define('fec_filing', {
+    class Filing extends Sequelize.Model {}
+
+    Filing.init({
         filing_id: {
             type: DataTypes.INTEGER,
             primaryKey: true
@@ -24,21 +27,18 @@ module.exports = function(sequelize, DataTypes) {
         report_number: DataTypes.INTEGER,
         comment: DataTypes.STRING(255)
     }, {
+        sequelize,
+        modelName: 'fec_filing',
         timestamps: true,
-        classMethods: {
-            match: function (row) {
-                if (row.record_type && row.record_type == 'HDR') {
-                    return true;
-                }
-                return false;
-            }
-        },
         indexes: [{
             fields: ['report_id']
         },{
             fields: ['report_number']
         }]
     });
+
+    Filing.match = row => 
+        row.record_type && row.record_type == 'HDR';
 
     return Filing;
 };

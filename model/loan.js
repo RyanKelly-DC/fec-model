@@ -1,7 +1,10 @@
-var moment = require('moment');
+const moment = require('moment'),
+      Sequelize = require('sequelize');
 
 module.exports = function(sequelize, DataTypes) {
-    var Loan = sequelize.define('fec_loan', {
+    class Loan extends Sequelize.Model {}
+
+    Loan.init({
         filing_id: DataTypes.INTEGER,
         form_type: DataTypes.STRING(50),
         filer_committee_id_number: DataTypes.STRING(50),
@@ -51,20 +54,8 @@ module.exports = function(sequelize, DataTypes) {
         memo_code: DataTypes.STRING(5),
         memo_text_description: DataTypes.STRING(200)
     }, {
-        classMethods: {
-            associate: function(models) {
-                Loan.belongsTo(models.fec_filing, {
-                    foreignKey: 'filing_id',
-                    onDelete: 'CASCADE'
-                });
-            },
-            match: function(row) {
-                if (row.form_type && row.form_type.match(/^SC/)) {
-                    return true;
-                }
-                return false;
-            }
-        },
+        sequelize,
+        modelName: 'fec_loan',
         indexes: [{
             fields: ['filing_id']
         }, {
@@ -73,6 +64,15 @@ module.exports = function(sequelize, DataTypes) {
             fields: ['memo_code']
         }]
     });
+
+    Loan.associate = models => 
+        Loan.belongsTo(models.fec_filing, {
+            foreignKey: 'filing_id',
+            onDelete: 'CASCADE'
+        });
+
+    Loan.match = row =>
+        row.form_type && row.form_type.match(/^SC/);    
 
     return Loan;
 };

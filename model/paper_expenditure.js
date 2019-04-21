@@ -1,13 +1,13 @@
-var moment = require('moment');
+const moment = require('moment'),
+      Sequelize = require('sequelize');
 
 module.exports = function(sequelize, DataTypes) {
-    var Expenditure = sequelize.define('fec_expenditure', {
-        // cycle: DataTypes.STRING(5),
+    class PaperExpenditure extends Sequelize.Model {}
+
+    PaperExpenditure.init({
         filing_id: DataTypes.INTEGER,
         form_type: DataTypes.STRING(20),
         filer_committee_id_number: DataTypes.STRING(30),
-        transaction_id_number: DataTypes.STRING(30),
-        entity_type: DataTypes.STRING(5),
         payee_organization_name: DataTypes.STRING(255),
         payee_last_name: DataTypes.STRING(255),
         payee_first_name: DataTypes.STRING(255),
@@ -25,7 +25,13 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.DATEONLY,
             set: function(val) {
                 if (val && !(val instanceof Date) && val.match(/^[0-9]{8}$/)) {
-                    this.setDataValue('expenditure_date', moment(val, 'YYYYMMDD').toDate());
+                    var m = moment(val, 'YYYYMMDD');
+                    if (m.isValid()) {
+                        this.setDataValue('expenditure_date', m.toDate());
+                    }
+                    else {
+                        this.setDataValue('expenditure_date', null);
+                    }
                 }
                 else {
                     this.setDataValue('expenditure_date', val);
@@ -36,9 +42,7 @@ module.exports = function(sequelize, DataTypes) {
         semi_annual_refunded_bundled_amt: DataTypes.STRING(50),
         expenditure_purpose_descrip: DataTypes.STRING(255),
         category_code: DataTypes.STRING(10),
-        beneficiary_committee_fec_id: DataTypes.STRING(50),
         beneficiary_committee_name: DataTypes.STRING(255),
-        beneficiary_candidate_fec_id: DataTypes.STRING(50),
         beneficiary_candidate_last_name: DataTypes.STRING(100),
         beneficiary_candidate_first_name: DataTypes.STRING(100),
         beneficiary_candidate_middle_name: DataTypes.STRING(100),
@@ -47,33 +51,12 @@ module.exports = function(sequelize, DataTypes) {
         beneficiary_candidate_suffix: DataTypes.STRING(10),
         beneficiary_candidate_state: DataTypes.STRING(10),
         beneficiary_candidate_district: DataTypes.STRING(10),
-        conduit_name: DataTypes.STRING(255),
-        conduit_street_1: DataTypes.STRING(200),
-        conduit_street_2: DataTypes.STRING(200),
-        conduit_city: DataTypes.STRING(100),
-        conduit_state: DataTypes.STRING(10),
-        conduit_zip_code: DataTypes.STRING(50),
         memo_code: DataTypes.STRING(5),
         memo_text_description: DataTypes.STRING(200),
-        back_reference_tran_id_number: DataTypes.STRING(255),
-        back_reference_sched_name: DataTypes.STRING(100),
-        reference_to_si_or_sl_system_code_that_identifies_the_account: DataTypes.STRING(50)
+        image_number: DataTypes.STRING(200)
     },{
-        classMethods: {
-            associate: function(models) {
-                Expenditure.belongsTo(models.fec_filing,{
-                    as: 'Filing',
-                    foreignKey: 'filing_id',
-                    onDelete: 'CASCADE'
-                });
-            },
-            match: function (row) {
-                if (row.form_type && row.form_type.match(/^SB/)) {
-                    return true;
-                }
-                return false;
-            }
-        },
+        sequelize,
+        modelName: 'fec_paper_expenditure',
         indexes: [{
             fields: ['filing_id']
         },{
@@ -83,24 +66,39 @@ module.exports = function(sequelize, DataTypes) {
         }, {
             fields: ['form_type']
         }, {
-            name: 'fec_expenditures_payee_organization_name',
-            fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('to_tsvector', 'english', sequelize.col('payee_organization_name') )] : 'payee_organization_name',
-            using: sequelize.getDialect() == 'postgres' ? 'gin' : null
+            name: 'fec_paper_expenditures_payee_organization_name',
+            fields: sequelize.getDialect() == 'postgres' ?
+                [sequelize.fn('to_tsvector', 'english', sequelize.col('payee_organization_name') )] :
+                'payee_organization_name',
+            using: sequelize.getDialect() == 'postgres' ?
+                'gin' : null
         }, {
-            name: 'fec_expenditures_payee_first_name_trgm',
-            fields: ['payee_first_name'],
-            method: 'gin',
-            operator: 'gin_trgm_ops'
+            name: 'fec_paper_expenditures_payee_payee_first_name',
+            fields: sequelize.getDialect() == 'postgres' ?
+                [sequelize.fn('lower', sequelize.col('payee_first_name') )] :
+                'payee_first_name'
         }, {
-            name: 'fec_expenditures_payee_last_name_trgm',
-            fields: ['payee_last_name'],
-            method: 'gin',
-            operator: 'gin_trgm_ops'
+            name: 'fec_paper_expenditures_payee_payee_last_name',
+            fields: sequelize.getDialect() == 'postgres' ?
+                [sequelize.fn('lower', sequelize.col('payee_last_name') )] :
+                'payee_last_name'
         }, {
-            name: 'fec_expenditures_payee_payee_state',
-            fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('lower', sequelize.col('payee_state') )] : 'payee_state'
+            name: 'fec_paper_expenditures_payee_payee_state',
+            fields: sequelize.getDialect() == 'postgres' ?
+                [sequelize.fn('lower', sequelize.col('payee_state') )] :
+                'payee_state'
         }]
     });
 
-    return Expenditure;
+    PaperExpenditure.associate = models => 
+        PaperExpenditure.belongsTo(models.fec_paper_filing,{
+            as: 'Filing',
+            foreignKey: 'filing_id',
+            onDelete: 'CASCADE'
+        });
+
+    PaperExpenditure.match = row => 
+        row.form_type && row.form_type.match(/^SB/) && row.image_number;
+
+    return PaperExpenditure;
 };

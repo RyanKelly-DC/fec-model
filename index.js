@@ -1,12 +1,12 @@
-var rread = require('readdir-recursive'),
+const rread = require('readdir-recursive'),
     path = require('path'),
     Sequelize = require('sequelize'),
     sync = require('./sync');
 
 module.exports = function (options) {
-    var basename = path.basename(module.filename + '/model');
+    let basename = path.basename(module.filename + '/model');
 
-    var sequelize = new Sequelize(options.name, options.user, options.pass,{
+    let sequelize = new Sequelize(options.name, options.user, options.pass,{
         host: options.host,
         dialect: options.driver,
         port: options.port,
@@ -19,20 +19,20 @@ module.exports = function (options) {
         logging: false
     });
 
-    var db = {};
+    let db = {};
 
     rread
         .fileSync(__dirname + '/model')
-        .filter(function(file) {
+        .filter(file => {
             file = path.basename(file);
             return (file.slice(-3) === '.js') && (file !== basename);
         })
-        .forEach(function(file) {
-            var model = sequelize['import'](file);
+        .forEach(file => {
+            let model = sequelize['import'](file);
             db[model.name] = model;
         });
 
-    Object.keys(db).forEach(function(modelName) {
+    Object.keys(db).forEach(modelName => {
         if (db[modelName].associate) {
             db[modelName].associate(db);
         }

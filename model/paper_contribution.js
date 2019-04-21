@@ -1,7 +1,10 @@
-var moment = require('moment');
+const moment = require('moment'),
+      Sequelize = require('sequelize');
 
 module.exports = function(sequelize, DataTypes) {
-    var Contribution = sequelize.define('fec_paper_contribution', {
+    class PaperContribution extends Sequelize.Model {}
+
+    PaperContribution.init({
         filing_id: DataTypes.INTEGER,
         form_type: DataTypes.STRING(50),
         filer_committee_id_number: DataTypes.STRING(50),
@@ -43,21 +46,8 @@ module.exports = function(sequelize, DataTypes) {
         memo_text_description: DataTypes.STRING(255),
         image_number: DataTypes.STRING(200)
     }, {
-        classMethods: {
-            associate: function(models) {
-                Contribution.belongsTo(models.fec_paper_filing,{
-                    foreignKey: 'filing_id',
-                    onDelete: 'CASCADE'
-                });
-            },
-            match: function (row) {
-                if (row.form_type && row.form_type.match(/^SA/) && 
-                    !row.form_type.match(/^(SA3L)/) && row.image_number) {
-                    return true;
-                }
-                return false;
-            }
-        },
+        sequelize,
+        modelName: 'fec_paper_contribution',
         indexes: [{
             fields: ['filing_id']
         },{
@@ -68,19 +58,39 @@ module.exports = function(sequelize, DataTypes) {
             fields: ['form_type']
         }, {
             name: 'fec_paper_contribution_contributor_organization_name',
-            fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('to_tsvector', 'english', sequelize.col('contributor_organization_name') )] : 'contributor_organization_name',
-            using: sequelize.getDialect() == 'postgres' ? 'gin' : null
+            fields: sequelize.getDialect() == 'postgres' ?
+                [sequelize.fn('to_tsvector', 'english', sequelize.col('contributor_organization_name') )] :
+                'contributor_organization_name',
+            using: sequelize.getDialect() == 'postgres' ?
+                'gin'
+                : null
         }, {
             name: 'fec_paper_contribution_contributor_first_name',
-            fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('lower', sequelize.col('contributor_first_name') )] : 'contributor_first_name'
+            fields: sequelize.getDialect() == 'postgres' ?
+            [sequelize.fn('lower', sequelize.col('contributor_first_name') )] :
+            'contributor_first_name'
         }, {
             name: 'fec_paper_contribution_contributor_last_name',
-            fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('lower', sequelize.col('contributor_last_name') )] : 'contributor_last_name'
+            fields: sequelize.getDialect() == 'postgres' ?
+            [sequelize.fn('lower', sequelize.col('contributor_last_name') )] :
+            'contributor_last_name'
         }, {
             name: 'fec_paper_contribution_contributor_state',
-            fields: sequelize.getDialect() == 'postgres' ? [sequelize.fn('lower', sequelize.col('contributor_state') )] : 'contributor_state'
+            fields: sequelize.getDialect() == 'postgres' ?
+            [sequelize.fn('lower', sequelize.col('contributor_state') )] :
+            'contributor_state'
         }]
     });
 
-    return Contribution;
+    PaperContribution.associate = models =>
+        PaperContribution.belongsTo(models.fec_paper_filing,{
+            foreignKey: 'filing_id',
+            onDelete: 'CASCADE'
+        });
+
+    PaperContribution.match = row =>
+        row.form_type && row.form_type.match(/^SA/) && 
+                    !row.form_type.match(/^(SA3L)/) && row.image_number;
+
+    return PaperContribution;
 };

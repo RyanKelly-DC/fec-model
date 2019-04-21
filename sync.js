@@ -1,7 +1,7 @@
-var fs = require('fs');
+const fs = require('fs');
 
 function syncModels(options,cb) {
-    var models = require('./index')(options);
+    let models = require('./index')(options);
 
     console.info('syncing models to database');
     models.sequelize.sync()
@@ -25,23 +25,22 @@ function syncModels(options,cb) {
 
 
 function createExtension(options,cb) {
-    var pg = require('pg');
-
-    var conString = 'postgres://' + options.user + ':' + options.pass +
-                    '@' + options.host + ':' + options.port +'/' + options.name;
+    const { Client } = require('pg');
+    
+    const client = new Client({
+        ...options,
+        password: options.pass || process.env.PGPASSWORD,
+        database: options.name || process.env.PGDATABASE || process.env.USER
+    });
 
     console.info('connecting to database server');
-    pg.connect(conString, function(err, client, done) {
-        if (err) {
-            throw err;
-        }
+    client.connect();
 
-        console.info('creating extension if it doesn\'t exist');
-        client.query('CREATE EXTENSION pg_trgm;', function(err) {
-            client.end();
+    console.info('creating pg_trgm extension if it doesn\'t exist');
+    client.query('CREATE EXTENSION pg_trgm;', function(err) {
+        client.end();
 
-            cb();
-        });
+        cb();
     });
 }
 
@@ -49,23 +48,22 @@ function createDatabase(options,cb) {
     if (options.driver == 'postgres') {
         // try to create database first if dialect is postgres
         
-        var pg = require('pg');
+        const { Client } = require('pg');
 
-        var conString = 'postgres://' + options.user + ':' + options.pass +
-                        '@' + options.host + ':' + options.port +'/postgres';
+        const client = new Client({
+            ...options,
+            password: options.pass || process.env.PGPASSWORD,
+            database: 'postgres'
+        });
 
         console.info('connecting to database server');
-        pg.connect(conString, function(err, client, done) {
-            if (err) {
-                throw err;
-            }
+        client.connect();
 
-            console.info('creating database if it doesn\'t exist');
-            client.query('CREATE DATABASE ' + options.name, function(err) {
-                client.end();
+        console.info('creating database if it doesn\'t exist');
+        client.query('CREATE DATABASE ' + options.name, function(err) {
+            client.end();
 
-                createExtension(options,cb);
-            });
+            createExtension(options,cb);
         });
     }
     else {

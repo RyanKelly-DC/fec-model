@@ -1,7 +1,10 @@
-var moment = require('moment');
+const moment = require('moment'),
+      Sequelize = require('sequelize');
 
 module.exports = function(sequelize, DataTypes) {
-    var PaperCampaignSummary = sequelize.define('fec_paper_campaign_summary', {
+    class PaperCampaignSummary extends Sequelize.Model {}
+
+    PaperCampaignSummary.init({
         filing_id: {
             type: DataTypes.INTEGER,
             unique: true
@@ -147,31 +150,23 @@ module.exports = function(sequelize, DataTypes) {
             }
         }
     }, {
-        classMethods: {
-            associate: function(models) {
-                PaperCampaignSummary.belongsTo(models.fec_paper_filing, {
-                    foreignKey: 'filing_id',
-                    onDelete: 'CASCADE'
-                });
-
-                // PaperCampaignSummary.belongsTo(models.fec_amended_filing, {
-                //     constraints: false,
-                //     foreignKey: 'filing_id'
-                // });
-            },
-            match: function(row) {
-                if (row.form_type && row.form_type.match(/^(F3)/) &&
-                    !row.form_type.match(/^(F3Z|F3S|F3L)/) &&
-                    row.begin_image_number) {
-                    return true;
-                }
-                return false;
-            }
-        },
+        sequelize,
+        modelName: 'fec_paper_campaign_summary',
         indexes: [{
             fields: ['filer_committee_id_number']
         }]
     });
+
+    PaperCampaignSummary.associate = models => 
+        PaperCampaignSummary.belongsTo(models.fec_paper_filing, {
+            foreignKey: 'filing_id',
+            onDelete: 'CASCADE'
+        });
+
+    PaperCampaignSummary.match = row =>
+        row.form_type && row.form_type.match(/^(F3)/) &&
+                    !row.form_type.match(/^(F3Z|F3S|F3L)/) &&
+                    row.begin_image_number;
 
     return PaperCampaignSummary;
 };

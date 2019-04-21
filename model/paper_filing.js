@@ -1,7 +1,10 @@
-var moment = require('moment');
+const moment = require('moment'),
+      Sequelize = require('sequelize');
 
 module.exports = function(sequelize, DataTypes) {
-    var Filing = sequelize.define('fec_paper_filing', {
+    class PaperFiling extends Sequelize.Model {}
+
+    PaperFiling.init({
         filing_id: {
             type: DataTypes.INTEGER,
             primaryKey: true
@@ -38,19 +41,16 @@ module.exports = function(sequelize, DataTypes) {
             }
         }
     }, {
+        sequelize,
+        modelName: 'fec_paper_filing',
         timestamps: true,
-        classMethods: {
-            match: function (row) {
-                if (row.record_type && row.record_type == 'HDR' && row.fec_version[0] == 'P') {
-                    return true;
-                }
-                return false;
-            }
-        },
         indexes: [{
             fields: ['report_id']
         }]
     });
 
-    return Filing;
+    PaperFiling.match = row =>
+        row.record_type && row.record_type == 'HDR' && row.fec_version[0] == 'P';
+
+    return PaperFiling;
 };

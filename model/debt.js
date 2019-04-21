@@ -1,6 +1,9 @@
+const Sequelize = require('sequelize');
 
 module.exports = function(sequelize, DataTypes) {
-    var Debt = sequelize.define('fec_debt', {
+    class Debt extends Sequelize.Model {}
+
+    Debt.init({
         filing_id: DataTypes.INTEGER,
         form_type: DataTypes.STRING(50),
         filer_committee_id_number: DataTypes.STRING(50),
@@ -23,26 +26,23 @@ module.exports = function(sequelize, DataTypes) {
         payment_amount_this_period: DataTypes.DECIMAL(12,2),
         balance_at_close_this_period: DataTypes.DECIMAL(12,2)
     }, {
-        classMethods: {
-            associate: function(models) {
-                Debt.belongsTo(models.fec_filing, {
-                    foreignKey: 'filing_id',
-                    onDelete: 'CASCADE'
-                });
-            },
-            match: function(row) {
-                if (row.form_type && row.form_type.match(/^SD/)) {
-                    return true;
-                }
-                return false;
-            }
-        },
+        sequelize,
+        modelName: 'fec_debt',
         indexes: [{
             fields: ['filing_id']
         }, {
             fields: ['filer_committee_id_number']
         }]
     });
+
+    Debt.associate = models => 
+        Debt.belongsTo(models.fec_filing,{
+            foreignKey: 'filing_id',
+            onDelete: 'CASCADE'
+        });
+
+    Debt.match = row =>
+        row.form_type && row.form_type.match(/^SD/);
 
     return Debt;
 };
