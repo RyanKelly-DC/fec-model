@@ -72,7 +72,9 @@ module.exports = function(sequelize, DataTypes) {
         });
 
     Loan.match = row =>
-        row.form_type && row.form_type.match(/^SC/) && !row.form_type.match(/^SC1/);    
+        row.form_type && row.form_type.match(/^SC/) &&
+            !row.form_type.match(/^SC1/) &&
+            !row.form_type.match(/^SC2/);    
 
     return Loan;
 };
