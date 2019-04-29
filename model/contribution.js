@@ -73,27 +73,24 @@ module.exports = function(sequelize, DataTypes) {
         }, {
             fields: ['form_type']
         }, {
-            name: 'fec_contributions_contributor_organization_name',
-            fields: sequelize.getDialect() == 'postgres' ?
-                [sequelize.fn('to_tsvector', 'english', sequelize.col('contributor_organization_name') )] :
-                'contributor_organization_name',
-            using: sequelize.getDialect() == 'postgres' ?
-                'gin' :
-                null
+            name: 'fec_contributions_contributor_organization_name_trgm',
+            fields: ['contributor_organization_name'],
+            using: sequelize.getDialect() == 'postgres' ? 'gin' : null,
+            operator: sequelize.getDialect() == 'postgres' ? 'gin_trgm_ops' : null
         }, {
             name: 'fec_contributions_contributor_first_name_trgm',
             fields: ['contributor_first_name'],
-            using: 'gin',
-            operator: 'gin_trgm_ops'
+            using: sequelize.getDialect() == 'postgres' ? 'gin' : null,
+            operator: sequelize.getDialect() == 'postgres' ? 'gin_trgm_ops' : null
         }, {
             name: 'fec_contributions_contributor_last_name_trgm',
             fields: ['contributor_last_name'],
-            using: 'gin',
-            operator: 'gin_trgm_ops'
+            using: sequelize.getDialect() == 'postgres' ? 'gin' : null,
+            operator: sequelize.getDialect() == 'postgres' ? 'gin_trgm_ops' : null
         }, {
             name: 'fec_contributions_contributor_state',
             fields: sequelize.getDialect() == 'postgres' ?
-                [sequelize.fn('lower', sequelize.col('contributor_state') )] :
+                [sequelize.fn('upper', sequelize.col('contributor_state') )] :
                 'contributor_state'
         }]
     });
