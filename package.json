@@ -1,5 +1,7 @@
 {
   "name": "@publici/fec-model",
+  "description": "A simplifying Sequelize database model for some of the key FEC forms",
+  "repository": "github:PublicI/fec-model",
   "version": "1.0.1",
   "main": "index.js",
   "license": "MIT",
@@ -7,6 +9,6 @@
     "moment": "^2.24.0",
     "pg": "^7.12.1",
     "readdir-recursive": "0.0.4",
-    "sequelize": "^5.19.0"
+    "sequelize": "^5.21.1"
   }
 }
