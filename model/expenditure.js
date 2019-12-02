@@ -91,7 +91,7 @@ module.exports = function(sequelize, DataTypes) {
             name: 'fec_expenditures_payee_state',
             fields: sequelize.getDialect() == 'postgres' ?
                 [sequelize.fn('upper', sequelize.col('payee_state') )] :
-                'payee_state'
+                ['payee_state']
         }]
     });
 

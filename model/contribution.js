@@ -91,7 +91,7 @@ module.exports = function(sequelize, DataTypes) {
             name: 'fec_contributions_contributor_state',
             fields: sequelize.getDialect() == 'postgres' ?
                 [sequelize.fn('upper', sequelize.col('contributor_state') )] :
-                'contributor_state'
+                ['contributor_state']
         }]
     });
 
