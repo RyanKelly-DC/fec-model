@@ -1,7 +1,7 @@
 {
-  "name": "@RyanKelly-DC/fec-model",
+  "name": "@ryankelly-dc/fec-model",
   "description": "A simplifying Sequelize database model for some of the key FEC forms",
-  "repository": "github:RyanKelly-DC/fec-model",
+  "repository": "github:ryankelly-dc/fec-model",
   "version": "1.0.2",
   "main": "index.js",
   "license": "MIT",
